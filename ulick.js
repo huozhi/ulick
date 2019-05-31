@@ -1,8 +1,10 @@
+const isPointerSupported = Boolean(window.PointerEvent)
+const isTouchSupported = Boolean(window.TouchEvent)
 const mouseEvents = ['mousedown', 'mouseup']
 const touchEvents = ['touchstart', 'touchend']
 const pointerEvents = ['pointerdown', 'pointerup']
-const isPointerSupported = Boolean(window.PointerEvent)
-const isTouchSupported = Boolean(window.TouchEvent)
+
+const hoverEvents = isPointerSupported ? ['pointerenter', 'pointerleave'] : ['mouseenter', 'mouseleave']
 
 const isMouseTypeEvent = e => e.pointerType === 'mouse' || (e instanceof window.MouseEvent)
 const isTouchTypeEvent = e => e.pointerType === 'touch' || (e instanceof window.TouchEvent)
@@ -14,6 +16,9 @@ function ulick(node, {
   onMouseDown = () => {},
   onMouseUp = () => {},
   onMouseClick = () => {},
+  onHoverEnter = () => {},
+  onHoverLeave = () => {},
+  onHover = () => {},
 }) {
   let sticking = false
 
@@ -33,17 +38,35 @@ function ulick(node, {
     }
   }
 
-  const [inEvent, outEvent] = 
+  let hovering = false
+  function handleHoverEnter(e) {
+    hovering = true
+    if (isMouseTypeEvent(e)) onHoverEnter(e)
+  }
+
+  function handleHoverLeave(e) {
+    if (isMouseTypeEvent(e)) onHoverLeave(e)
+    if (hovering && isMouseTypeEvent(e)) onHover(e)
+    hovering = false
+  }
+
+  const [clickInEvent, clickOutEvent] =
     isPointerSupported ? pointerEvents : (
       isTouchSupported ? touchEvents : mouseEvents
     )
-  
-  node.addEventListener(inEvent, handleDown)
-  node.addEventListener(outEvent, handleUp)
+
+  node.addEventListener(clickInEvent, handleDown)
+  node.addEventListener(clickOutEvent, handleUp)
+
+  node.addEventListener(hoverEvents[0], handleHoverEnter)
+  node.addEventListener(hoverEvents[1], handleHoverLeave)
 
   return function release() {
-    node.removeEventListener(inEvent, handleDown)
-    node.removeEventListener(outEvent, handleUp)
+    node.removeEventListener(clickInEvent, handleDown)
+    node.removeEventListener(clickOutEvent, handleUp)
+
+    node.addEventListener(hoverEvents[0], handleHoverEnter)
+    node.addEventListener(hoverEvents[1], handleHoverLeave)
   }
 }
 
