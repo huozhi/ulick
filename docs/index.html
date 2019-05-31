@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width">
+  <title>ulick | Universal Click / Touch Experience</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: auto;
+    }
+    * {
+      touch-action: manipulation;
+      box-sizing: border-box;
+    }
+    #app {
+      width: 100vw;
+      height: 100vh;
+      background: #f3cfcf;
+    }
+    .touch__pad {
+      width: 100%;
+      height: 100%;
+    }
+    .touch__point {
+      position: absolute;
+      border-radius: 50%;
+      background-color: aquamarine;
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+    .touch__point--flicking {
+      animation: flicking 0.7s ease-out;
+    }
+    .touch__manifesto {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 100vw;
+      font-size: 100px;
+      line-height: 40vh;
+      color: #444;
+      font-weight: bolder;
+      text-transform: uppercase;
+      font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+    }
+    @keyframes flicking {
+      0% {
+        opacity: 0;
+        width: 30px;
+        height: 30px;
+      }
+      10% {
+        opacity: 1;
+        width: 40px;
+        height: 40px;
+      }
+      100% {
+        opacity: 0;
+        width: 0px;
+        height: 0px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="touch__pad">
+    <span class="touch__manifesto">click</span>
+  </div>
+</div>
+
+<script src="app.js" type="module" crossorigin></script>
+</body>
+</html>
