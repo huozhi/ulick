@@ -18,7 +18,6 @@ function ulick(node, {
   onMouseClick = () => {},
   onHoverEnter = () => {},
   onHoverLeave = () => {},
-  onHover = () => {},
 }) {
   let sticking = false
 
@@ -38,16 +37,12 @@ function ulick(node, {
     }
   }
 
-  let hovering = false
   function handleHoverEnter(e) {
-    hovering = true
     if (isMouseTypeEvent(e)) onHoverEnter(e)
   }
 
   function handleHoverLeave(e) {
     if (isMouseTypeEvent(e)) onHoverLeave(e)
-    if (hovering && isMouseTypeEvent(e)) onHover(e)
-    hovering = false
   }
 
   const [clickInEvent, clickOutEvent] =
