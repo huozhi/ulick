@@ -1,5 +1,5 @@
 import ulick
-  from 'https://cdn.jsdelivr.net/gh/huozhi/ulick@0.0.2-rc/ulick.js'
+  from 'https://cdn.jsdelivr.net/gh/huozhi/ulick@master/ulick.js'
 
 const animatingClsSelector = 'touch__point--flicking'
 const fadingClsSelector = 'hover__pad--fading'
