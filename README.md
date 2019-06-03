@@ -23,7 +23,6 @@ ulick(domNode, {
   // for mouse hover
   onHoverEnter(event) { /*...*/ },
   onHoverLeave(event) { /*...*/ },
-  onHover(event) { /*...*/ },
 })
 ```
 
