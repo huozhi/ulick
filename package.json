@@ -1,6 +1,6 @@
 {
   "name": "ulick",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "cross-browser click / single touch / hover handler",
   "main": "ulick.js",
   "directories": {
