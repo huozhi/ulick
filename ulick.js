@@ -9,41 +9,66 @@ const hoverEvents = isPointerSupported ? ['pointerenter', 'pointerleave'] : ['mo
 const isMouseTypeEvent = e => e.pointerType === 'mouse' || (e instanceof window.MouseEvent)
 const isTouchTypeEvent = e => e.pointerType === 'touch' || (e instanceof window.TouchEvent)
 
+function safeCall(fn) {
+  return (...args) => {
+    (typeof fn === 'function') && fn(...args)
+  }
+}
+
 function ulick(node, {
-  onTouchDown = () => {},
-  onTouchUp = () => {},
-  onTouchClick = () => {},
-  onMouseDown = () => {},
-  onMouseUp = () => {},
-  onMouseClick = () => {},
-  onHoverEnter = () => {},
-  onHoverLeave = () => {},
+  onTouchDown,
+  onTouchDownCapture,
+  onTouchUp,
+  onTouchUpCapture,
+  onTouchClick,
+  onTouchClickCapture,
+
+  onMouseDown,
+  onMouseDownCapture,
+  onMouseUp,
+  onMouseUpCapture,
+  onMouseClick,
+  onMouseClickCapture,
+
+  onHoverEnter,
+  onHoverEnterCapture,
+  onHoverLeave,
+  onHoverLeaveCapture,
 }) {
   let sticking = false
 
   function handleDown(e) {
     sticking = true
-    if (isMouseTypeEvent(e)) onMouseDown(e)
-    if (isTouchTypeEvent(e)) onTouchDown(e)
+    if (isMouseTypeEvent(e)) safeCall(onMouseDown)(e)
+    if (isTouchTypeEvent(e)) safeCall(onTouchDown)(e)
   }
 
   function handleUp(e) {
-    if (isMouseTypeEvent(e)) onMouseUp(e)
-    if (isTouchTypeEvent(e)) onTouchUp(e)
+    if (isMouseTypeEvent(e)) safeCall(onMouseUp)(e)
+    if (isTouchTypeEvent(e)) safeCall(onTouchUp)(e)
     if (sticking) {
       sticking = false
-      if (isMouseTypeEvent(e)) onTouchClick(e)
-      if (isTouchTypeEvent(e)) onMouseClick(e)
+      if (isMouseTypeEvent(e)) safeCall(onTouchClick)(e)
+      if (isTouchTypeEvent(e)) safeCall(onMouseClick)(e)
     }
   }
 
   function handleHoverEnter(e) {
-    if (isMouseTypeEvent(e)) onHoverEnter(e)
+    if (isMouseTypeEvent(e)) safeCall(onHoverEnter)(e)
   }
 
   function handleHoverLeave(e) {
-    if (isMouseTypeEvent(e)) onHoverLeave(e)
+    if (isMouseTypeEvent(e)) safeCall(onHoverLeave)(e)
   }
+
+  const isClickUseCapture = Boolean(
+    onTouchDownCapture ||
+    onTouchUpCapture ||
+    onTouchClickCapture ||
+    onMouseDownCapture ||
+    onMouseUpCapture ||
+    onMouseClickCapture
+  )
 
   const [clickInEvent, clickOutEvent] =
     isPointerSupported ? pointerEvents : (
@@ -56,12 +81,32 @@ function ulick(node, {
   node.addEventListener(hoverEvents[0], handleHoverEnter)
   node.addEventListener(hoverEvents[1], handleHoverLeave)
 
+  if (isClickUseCapture) {
+    node.addEventListener(clickInEvent, handleDown, true)
+    node.addEventListener(clickOutEvent, handleUp, true)
+  }
+
+  if (Boolean(onHoverEnterCapture || onHoverLeaveCapture)) {
+    node.addEventListener(hoverEvents[0], handleHoverEnter, true)
+    node.addEventListener(hoverEvents[1], handleHoverLeave, true)
+  }
+
   return function release() {
     node.removeEventListener(clickInEvent, handleDown)
     node.removeEventListener(clickOutEvent, handleUp)
 
-    node.addEventListener(hoverEvents[0], handleHoverEnter)
-    node.addEventListener(hoverEvents[1], handleHoverLeave)
+    node.removeEventListener(hoverEvents[0], handleHoverEnter)
+    node.removeEventListener(hoverEvents[1], handleHoverLeave)
+
+    if (isClickUseCapture) {
+      node.removeEventListener(clickInEvent, handleDown, true)
+      node.removeEventListener(clickOutEvent, handleUp, true)
+    }
+
+    if (Boolean(onHoverEnterCapture || onHoverLeaveCapture)) {
+      node.removeEventListener(hoverEvents[0], handleHoverEnter, true)
+      node.removeEventListener(hoverEvents[1], handleHoverLeave, true)
+    }
   }
 }
 
